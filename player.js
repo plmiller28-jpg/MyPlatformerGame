@@ -26,15 +26,15 @@ var PLAYER_CROUCH_OFFSET_Y = 16; // = 4 + (28 - 16)
 // Called from preload() in game.js
 function playerPreload(scene) {
   if (PLAYER_CHAR === "Chef") {
-    // Chef uses a single image for all animation states.
-    // We load the same file under each key so the rest of the code works unchanged.
-    var chefPath = "assets/2d/Main Characters/chef.png";
-    var chefFrame = { frameWidth: 1312, frameHeight: 1199 };
-    scene.load.spritesheet("player-idle", chefPath, chefFrame);
-    scene.load.spritesheet("player-run", chefPath, chefFrame);
-    scene.load.spritesheet("player-jump", chefPath, chefFrame);
-    scene.load.spritesheet("player-fall", chefPath, chefFrame);
-    scene.load.spritesheet("player-crouch", chefPath, chefFrame);
+    // All chef states use the run sheet (5 frames at 32x32). Idle/jump/fall/crouch
+    // just hold on frame 0 so everything stays consistent at 32x32.
+    var chefRun = "assets/2d/Main Characters/chefrunSM01.png";
+    var chefFrame = { frameWidth: 32, frameHeight: 32 };
+    scene.load.spritesheet("player-idle", chefRun, chefFrame);
+    scene.load.spritesheet("player-jump", chefRun, chefFrame);
+    scene.load.spritesheet("player-fall", chefRun, chefFrame);
+    scene.load.spritesheet("player-crouch", chefRun, chefFrame);
+    scene.load.spritesheet("player-run", chefRun, chefFrame);
   } else {
     var base = "assets/2d/Main Characters/" + PLAYER_CHAR + "/";
     scene.load.spritesheet("player-idle", base + "Idle (32x32).png", {
@@ -70,11 +70,6 @@ function playerCreate(scene, x, y, groundLayer) {
   var player = scene.physics.add.sprite(x, y, "player-idle");
   player.setCollideWorldBounds(true); // can't walk off the edge of the map
 
-  // Scale the chef sprite down to fit the game world (the source image is large).
-  if (PLAYER_CHAR === "Chef") {
-    player.setDisplaySize(48, 48); // display size in pixels — change to taste
-  }
-
   // Shrink the physics hitbox so it matches the visible character, not the full frame.
   // Reduces edge-lock on tile corners and makes hazard hits feel fair.
   player.body.setSize(PLAYER_HITBOX_WIDTH, PLAYER_HITBOX_HEIGHT);
@@ -99,7 +94,7 @@ function playerCreate(scene, x, y, groundLayer) {
     key: "run",
     frames: scene.anims.generateFrameNumbers("player-run", {
       start: 0,
-      end: isChef ? 0 : 11,
+      end: isChef ? 4 : 11, // chefrunSM01 has 5 frames (0-4)
     }),
     frameRate: 12,
     repeat: -1,
