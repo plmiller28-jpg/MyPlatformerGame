@@ -78,3 +78,32 @@ When helping students modify the game, assume this foundation is already in plac
 - Suggest small, testable steps — one feature at a time
 - If something won't work in a browser without a server, say so clearly
 - Do not refactor working code unless the student asks
+
+## Recent Changes (Updated May 7, 2026)
+
+**GitHub Repository Status:**
+- Working with: https://github.com/plmiller28-jpg/MyPlatformerGame
+- Active branch: `design`
+- All changes committed and pushed successfully
+
+**New Character Sprites Added to `design` Branch:**
+- `chefaction1.png` — Chef character action sprite
+- `chefrunning.png` — Chef character running sprite  
+- `chef.png` — Chef character sprite
+- `codekids3_2.png` — Code kids character sprite
+- `NewChefSprite.png` — Updated chef sprite
+- `codeblock.png` — Code block asset
+- `chefrunSM01.png` — Chef character small sprite variant
+
+**Map Files Committed:**
+- `maps/level1.tmx` — Original Tiled map file (XML format)
+- `maps/level1.tmj` — Tiled JSON format map file (primary working map)
+
+**Git Commits Made:**
+- Added chef character sprites (various commits)
+- Added level1.tmx and level1.tmj map files
+- All changes pushed to `origin/design` branch
+
+**Project Structure Notes:**
+- Two repositories in use: `MyPlatformerGame` (original) and `MyPlatformerGame-github` (GitHub clone)
+- Use `MyPlatformerGame-github` when syncing to GitHub on the `design` branch
