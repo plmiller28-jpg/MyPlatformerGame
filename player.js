@@ -1,12 +1,13 @@
 // ─────────────────────────────────────────────
-//  player.js — Pink Man player character
+//  player.js — player character
 //  Edit this file to change how the player looks and feels.
+//  Set PLAYER_CHAR to "Chef" to play as the chef, or "Pink Man" etc.
 // ─────────────────────────────────────────────
 
 // ── Tuning values ──────────────────────────────
 var PLAYER_SPEED = 220; // horizontal move speed (pixels/sec)
 var PLAYER_JUMP = -500; // jump velocity — more negative = higher jump
-var PLAYER_CHAR = "Pink Man"; // folder name inside assets/2d/Main Characters/
+var PLAYER_CHAR = "Chef"; // set to "Chef" or a folder name like "Pink Man", "Ninja Frog", etc.
 
 // Hitbox size — smaller than the 32x32 sprite frame to avoid snagging on tile corners
 // and to give the player a "generous" feel (hazards must clearly overlap to register).
@@ -24,27 +25,39 @@ var PLAYER_CROUCH_OFFSET_Y = 16; // = 4 + (28 - 16)
 // ── Asset loading ──────────────────────────────
 // Called from preload() in game.js
 function playerPreload(scene) {
-  var base = "assets/2d/Main Characters/" + PLAYER_CHAR + "/";
-  scene.load.spritesheet("player-idle", base + "Idle (32x32).png", {
-    frameWidth: 32,
-    frameHeight: 32,
-  });
-  scene.load.spritesheet("player-run", base + "Run (32x32).png", {
-    frameWidth: 32,
-    frameHeight: 32,
-  });
-  scene.load.spritesheet("player-jump", base + "Jump (32x32).png", {
-    frameWidth: 32,
-    frameHeight: 32,
-  });
-  scene.load.spritesheet("player-fall", base + "Fall (32x32).png", {
-    frameWidth: 32,
-    frameHeight: 32,
-  });
-  scene.load.spritesheet("player-crouch", base + "Crouch (32x32).png", {
-    frameWidth: 32,
-    frameHeight: 32,
-  });
+  if (PLAYER_CHAR === "Chef") {
+    // Chef uses a single image for all animation states.
+    // We load the same file under each key so the rest of the code works unchanged.
+    var chefPath = "assets/2d/Main Characters/chef.png";
+    var chefFrame = { frameWidth: 1312, frameHeight: 1199 };
+    scene.load.spritesheet("player-idle", chefPath, chefFrame);
+    scene.load.spritesheet("player-run", chefPath, chefFrame);
+    scene.load.spritesheet("player-jump", chefPath, chefFrame);
+    scene.load.spritesheet("player-fall", chefPath, chefFrame);
+    scene.load.spritesheet("player-crouch", chefPath, chefFrame);
+  } else {
+    var base = "assets/2d/Main Characters/" + PLAYER_CHAR + "/";
+    scene.load.spritesheet("player-idle", base + "Idle (32x32).png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    scene.load.spritesheet("player-run", base + "Run (32x32).png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    scene.load.spritesheet("player-jump", base + "Jump (32x32).png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    scene.load.spritesheet("player-fall", base + "Fall (32x32).png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    scene.load.spritesheet("player-crouch", base + "Crouch (32x32).png", {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+  }
   scene.load.audio(
     "jump-sfx",
     "assets/audio/GameSFX/Bounce Jump/Retro Jump Simple C2 02.wav",
@@ -57,6 +70,11 @@ function playerCreate(scene, x, y, groundLayer) {
   var player = scene.physics.add.sprite(x, y, "player-idle");
   player.setCollideWorldBounds(true); // can't walk off the edge of the map
 
+  // Scale the chef sprite down to fit the game world (the source image is large).
+  if (PLAYER_CHAR === "Chef") {
+    player.setDisplaySize(48, 48); // display size in pixels — change to taste
+  }
+
   // Shrink the physics hitbox so it matches the visible character, not the full frame.
   // Reduces edge-lock on tile corners and makes hazard hits feel fair.
   player.body.setSize(PLAYER_HITBOX_WIDTH, PLAYER_HITBOX_HEIGHT);
@@ -65,12 +83,14 @@ function playerCreate(scene, x, y, groundLayer) {
   // Collide with ground tiles
   scene.physics.add.collider(player, groundLayer);
 
-  // Animations — edit frameRate to speed up or slow down
+  // Animations — edit frameRate to speed up or slow down.
+  // For the Chef character, all animations use a single frame (the full image).
+  var isChef = PLAYER_CHAR === "Chef";
   scene.anims.create({
     key: "idle",
     frames: scene.anims.generateFrameNumbers("player-idle", {
       start: 0,
-      end: 10,
+      end: isChef ? 0 : 10,
     }),
     frameRate: 11,
     repeat: -1, // loop forever
@@ -79,7 +99,7 @@ function playerCreate(scene, x, y, groundLayer) {
     key: "run",
     frames: scene.anims.generateFrameNumbers("player-run", {
       start: 0,
-      end: 11,
+      end: isChef ? 0 : 11,
     }),
     frameRate: 12,
     repeat: -1,
@@ -106,7 +126,7 @@ function playerCreate(scene, x, y, groundLayer) {
     key: "crouch",
     frames: scene.anims.generateFrameNumbers("player-crouch", {
       start: 0,
-      end: 1,
+      end: isChef ? 0 : 1,
     }),
     frameRate: 10, // plays the drop in ~0.2 seconds, then holds on the crouched pose
     repeat: 0,
